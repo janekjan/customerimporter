@@ -24,8 +24,9 @@ func main() {
 		log.Fatal(err)
 	}
 	
-	fmt.Print(domains)
-
+	for _, domain := range domains {
+		fmt.Printf(domain.String())
+	}
 }
 
 

@@ -14,6 +14,7 @@ import (
 	"slices"
 	"strings"
 	"log"
+	"fmt"
 )
 
 // DomainCount is a pair of values representing a domain and a number
@@ -21,6 +22,11 @@ import (
 type DomainCount struct {
 	domain string
 	count int
+}
+
+// DomainCount struct should print as CSV
+func (d *DomainCount) String() string {
+	return fmt.Sprintf("%s, %d\n", d.domain, d.count)
 }
 
 // InvalidAddressError is a email address domain parsing error
@@ -78,7 +84,7 @@ func loadCustomerCSV(filepath string) ([][]string, error) {
 // Errors dealing with CSV syntax are returned from here,
 // or those not considered fatal are logged via logger.
 func domainsFromCustomers(rawCustomers [][]string, logger *log.Logger) ([]string, error) {
-	domains := make([]string, 1, len(rawCustomers)) // Allocate all the memory at once
+	domains := make([]string, 0, len(rawCustomers)) // Allocate all the memory at once
 	for _, customer := range rawCustomers {
 		if len(customer) < 3 { // Catch wrong number of columns
 			return nil, errors.New("Faulty CSV syntax")
@@ -87,6 +93,7 @@ func domainsFromCustomers(rawCustomers [][]string, logger *log.Logger) ([]string
 		if err != nil {
 			if err == ErrInvalidAddress {
 				log.Print(err, domain)
+				continue
 			} else {
 				return nil, err
 			}
@@ -100,7 +107,7 @@ func domainsFromCustomers(rawCustomers [][]string, logger *log.Logger) ([]string
 // email domains along with the number of customers with email address in
 // that domain. The slice is sorted alphabetically by domain.
 func domainCount(rawDomains []string) ([]DomainCount, error) {
-	countedDomains := make([]DomainCount, 1)
+	countedDomains := make([]DomainCount, 0)
 	var previousDomain string
 	index := 0
 
